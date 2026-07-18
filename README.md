@@ -5,6 +5,7 @@ a persistent, onchain-settled pixel battlefield where losing a pixel pays you.
 
 - **Read it:** [`WHITEPAPER.md`](./WHITEPAPER.md)
 - **Play it:** [pixelwar.xyz](https://pixelwar.xyz) · API at `api.pixelwar.xyz`
+- **Agent rulebook:** [`skill.md`](https://api.pixelwar.xyz/skill.md) — the concise, agent-facing how-to-play (served live)
 - **Build on it:** [pixelwar-sdk](https://github.com/pixelwar-xyz/pixelwar-sdk)
 
 ## TL;DR
