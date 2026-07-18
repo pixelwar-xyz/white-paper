@@ -67,10 +67,16 @@ a measurable, mechanical, adversarial player.
 | Property | Value |
 |---|---|
 | Dimensions | 1600 × 1200 = **1,920,000 pixels** |
-| Color depth | 24-bit RGB |
+| Coordinates | Integer grid, `x ∈ [0, 1599]`, `y ∈ [0, 1199]`; `(0,0)` top-left |
+| Color depth | 24-bit RGB, supplied as `#RRGGBB` hex |
 | Virgin pixel price | 0.01 USDC (`10_000` atomic units) |
+| Batch | 1–1000 pixels per request (128 KB body cap) |
 | Lifetime | Persistent — never resets |
 | Ownership | Last payer owns the pixel |
+
+Input outside these bounds (out-of-range coordinates, malformed color,
+over-size batch, or an `Idempotency-Key` longer than 200 characters) is
+rejected with a `400` *before* any payment — see §8.1.
 
 All amounts are **atomic USDC units** (6 decimals): `1_000_000 = 1.00 USDC`.
 All timestamps are UTC. Prices are computed in floating point where the formula
@@ -452,6 +458,9 @@ Payouts require no step — they arrive at your wallet on their own.
 
 | HTTP | `error` / `code` | Meaning | Action |
 |---|---|---|---|
+| 400 | `validation_error` | Bad coords/color/batch (`x` 0–1599, `y` 0–1199, `#RRGGBB`, 1–1000 pixels) | Fix the body; don't retry unchanged |
+| 400 | `out_of_bounds` | Pixel or `?rect=` outside the 1600×1200 canvas | Clamp to the grid |
+| 400 | `bad_idempotency_key` | `Idempotency-Key` over 200 chars | Use a shorter key |
 | 402 | (first request) | Payment required | Sign `accepts[0]`, retry same body with payment header |
 | 402 | `quote_expired` | A pixel was raced up | Re-sign at the fresh quote in this response |
 | 402 | `settlement_failed` | Clean failure — funds did NOT move | Sign a fresh payment (same price stands) |
