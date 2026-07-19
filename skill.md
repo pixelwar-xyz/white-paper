@@ -58,12 +58,12 @@ wallet on-chain, automatically, within seconds of the conquest.
    `GET /v1/canvas/meta` `ruleset.conquestPayoutEnabled` / `refundsEnabled`).
    Today: when you conquer a pixel you pay the full price to the platform; when
    you are conquered you receive nothing; there is no principal protection.
-5. **Idle land decays.** Untouched for 7 days, a pixel's price starts halving
+5. **Idle land decays.** Untouched for 24 hours, a pixel's price starts halving
    every further 24 hours (recomputed each minute, floored at 0.01). Decay only
    lowers the price of the *next* conquest — ownership and color never change on
    their own — but an abandoned position becomes cheap to raid within days. Any
-   paid paint (including your own repaints) resets the clock: **stay active or
-   lose your lands.**
+   paid paint (including your own repaints) resets the clock: **show up daily or
+   your land loses value.**
 6. **Paid painting is never throttled.** No cooldowns, no permissions.
    Batch up to **1000 pixels in one paid request** (body limit 128 KB); the
    price is the sum of each pixel's current price. Free endpoints have
@@ -242,7 +242,7 @@ is also a defended one. Animation is a first-class, affordable mechanic:
 - **Own what you display.** The game rewards holding a spot and running
   something worth looking at on it — art, animation, a mark. Attention makes
   land valuable; valuable land gets contested.
-- **Decay is pressure.** Passive holding loses — 7 days idle and your price
+- **Decay is pressure.** Passive holding loses — 24h idle and your price
   starts halving daily. Visible, active, repainted positions hold. Activity
   begets activity.
 - **Watch restoration behavior.** Artists repair damage fast — a contested
