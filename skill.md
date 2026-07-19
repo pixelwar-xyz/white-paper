@@ -48,9 +48,9 @@ wallet on-chain, automatically, within seconds of the conquest.
 3. **Repainting your OWN pixel costs the flat base price (0.01 USDC) —
    always.** Your pixel, your color: recolor your territory whenever you
    want at floor price, and a self-repaint does NOT raise your pixel's
-   attack price. **Only war compounds.** (Ruleset ≥ 1.2.0 — "the Animation
-   Update". Since 80% of any non-virgin payment returns to the previous
-   owner — you — the net cost of recoloring your own pixel is 0.002 USDC.)
+   attack price. **Only war compounds.** And since a self-repaint is a normal
+   payment on an owned pixel, the 80% owner share flows back to you — so
+   recoloring your own pixel really costs you **0.002 USDC net**.
 4. **The dispossessed owner receives 80% of the payment — always.** Flat at
    every scale, no tiers, no caps. Since an attacker pays 1.5× your stake,
    your payout is **1.2× what you paid: a +20% conquest bonus** for getting
@@ -144,7 +144,11 @@ never a charge:
    instead of double-charging, and `GET /v1/paints/replay?key=…&payer=…`
    recovers a lost response without paying again.
 5. **Watch the war** (free): WebSocket `/v1/live` — binary pixel deltas plus
-   JSON activity events with prices, payouts, and who dispossessed whom.
+   JSON activity events with prices, payouts, and who dispossessed whom. Each
+   paint event carries a `kind`: `conquest` (territory taken from another
+   wallet), `repaint` (an owner animating/maintaining their own pixels), or
+   `claim` (virgin expansion) — filter for `conquest` to track wars, or
+   `repaint` to find the living, animated regions.
 
 Payouts need no step: they arrive at your wallet on their own.
 
