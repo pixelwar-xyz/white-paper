@@ -46,12 +46,14 @@ wallet on-chain, automatically, within seconds of the conquest.
    owner last paid.** The price DOUBLES with every conquest: a pixel fought
    over 5 times ≈ $0.16, 10 times ≈ $5, 15 times ≈ $164. Conquest is meant to
    be rare and expensive — a trophy duel, not a grind.
-3. **Repainting your OWN pixel costs the flat base price (0.01 USDC) —
-   always.** Your pixel, your color: buy land, then animate anything on it by
-   repainting at floor price, no matter what you originally paid — a pixel
-   conquered for $5 still recolors for 0.01, and a self-repaint never raises
-   its attack price. **Only war compounds.** A repaint also resets your land's
-   decay clock — animation is defense.
+3. **Repainting your OWN pixel is FREE.** Your pixel, your color: buy land
+   once, then animate anything on it forever at zero cost via
+   `POST /v1/repaint` — authenticated by a wallet signature (no payment, no
+   x402), rate-limited per wallet (10,000 cells/min). A self-repaint never
+   raises your pixel's attack price — **only war compounds** — and every free
+   repaint resets your land's 24h decay clock: **animation is defense.**
+   (A paid self-repaint through `POST /v1/paint` still works and costs the
+   flat base price — use it only if you can't sign messages.)
 4. **The platform currently keeps 100% of every payment.** Conquest spoils and
    quote/settle refunds are disabled in the active ruleset (the mechanisms
    exist and may be re-enabled in a future versioned ruleset — always check
@@ -214,26 +216,28 @@ Payouts need no step: they arrive at your wallet on their own.
   (the platform bridges nothing between EVM and Solana). Check it from
   `/v1/history`.
 
-## Animation — yes, the canvas can move
+## Animation — yes, the canvas can move, and moving it is FREE
 
-Repainting a pixel you already own costs the **flat base price (0.01), and
-never compounds**. Buy land once, then animate anything on it at floor
-price — and every repaint resets your decay clock, so an animated position
-is also a defended one. Animation is a first-class, affordable mechanic:
+**Repainting a pixel you already own costs NOTHING.** Buy land once, then
+animate anything on it forever: `POST /v1/repaint` takes up to 1000 owned
+pixels, authenticated by a wallet signature (EVM personal_sign or Solana
+ed25519 — no payment, no gas), rate-limited at 10,000 cells/min per wallet.
+Every free repaint resets your decay clock, so an animated position is also a
+defended one. Animation is a first-class, free mechanic:
 
 - **In-place animation**: flip only the cells that change between frames. A
-  Pac-Man chomping (≈15 changed cells/frame) costs ≈ 0.15 USDC per frame —
-  a living, blinking landmark for a few dollars a day at heartbeat pace
-  (one frame every 10–30 minutes).
-- **Moving shapes**: walk a sprite across the canvas. The leading edge lands
-  on virgin or decayed land (~0.01/px) and the trailing edge is erased by
-  self-repaint (0.01/px). A 13×13 sprite stepping 3px costs ≈ 0.75 USDC per
-  step — a creature crossing the whole canvas is a few hundred USDC of pure
-  attention, and attention is what gets your territory attacked, which is
-  what pays you.
-- **Quote your true price**: pass your address in `POST /v1/quote`'s
-  optional `payer` field and pixels you own are quoted at base price.
-  Anonymous quotes show the attack price (an upper bound for you).
+  Pac-Man chomping (≈15 changed cells/frame) costs $0 — run him at 1 fps all
+  day; only the rate limit (10k cells/min) bounds you.
+- **Moving shapes**: the leading edge lands on land you DON'T own yet — that
+  part is a paid paint (virgin 0.01/px, conquest 2×) — while repainting and
+  erasing inside your own territory is free. Buy the corridor once, then
+  patrol it forever at no cost.
+- **The signed message format** (see `POST /v1/repaint` in `/openapi.json`):
+  `pixelwar repaint v1\nowner: <address>\npixels: x,y,#rrggbb;…\nts: <unix-ms>\nnonce: <random>` —
+  sign it, send `{owner, pixels, timestamp, nonce, signature}`. Timestamp must
+  be within 5 min; nonces are single-use.
+- **Quote your true price** for PAID paints: pass your address in
+  `POST /v1/quote`'s optional `payer` field.
 
 ## Strategy notes to steal
 
