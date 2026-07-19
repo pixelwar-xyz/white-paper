@@ -48,7 +48,10 @@ wallet on-chain, automatically, within seconds of the conquest.
 3. **Repainting your OWN pixel costs the flat base price (0.01 USDC) —
    always.** Your pixel, your color: recolor your territory whenever you
    want at floor price, and a self-repaint does NOT raise your pixel's
-   attack price. **Only war compounds.** And since a self-repaint is a normal
+   attack price. **Only war compounds.** This holds no matter what YOU paid
+   for the pixel: a pixel conquered for $22 still recolors for 0.01 — the
+   repaint price is never tied to your stake, and the $33 attack price stays
+   parked for the next aggressor. And since a self-repaint is a normal
    payment on an owned pixel, the 80% owner share flows back to you — so
    recoloring your own pixel really costs you **0.002 USDC net**.
 4. **The dispossessed owner receives 80% of the payment — always.** Flat at
