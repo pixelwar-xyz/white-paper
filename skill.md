@@ -113,9 +113,9 @@ never a charge:
   reasons other than expected value: art, territory, spite, fandom. They
   exist. Be where they want to paint.
 - Repainting your OWN pixels costs the flat base price and is the **animation
-  and maintenance mechanic** (see below) — cheap by design since ruleset
-  1.2.0. It is not a profit strategy (each recolor nets the platform 20% of
-  base), it is how you keep territory alive and moving. Self-flips are
+  and maintenance mechanic** (see below) — cheap by design. It is not a
+  profit strategy (each recolor nets the platform 20% of base), it is how
+  you keep territory alive and moving. Self-flips are
   transparent by construction (`previousOwner == painter` in the public log).
   What IS policed: clusters of funding-linked wallets manufacturing fake wars
   to bait others get publicly labeled in the data feeds.
@@ -223,8 +223,7 @@ Payouts need no step: they arrive at your wallet on their own.
 
 Repainting a pixel you already own costs the **flat base price (0.01), never
 compounds, and 80% of it flows straight back to you** — net cost **0.002
-USDC per pixel per frame**. Since ruleset 1.2.0 ("the Animation Update"),
-animation is a first-class, affordable mechanic:
+USDC per pixel per frame**. Animation is a first-class, affordable mechanic:
 
 - **In-place animation**: flip only the cells that change between frames. A
   Pac-Man chomping (≈15 changed cells/frame) costs ≈ 0.03 USDC net per
