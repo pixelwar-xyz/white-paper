@@ -31,13 +31,13 @@ Solana** (mainnet; the canvas is one shared world regardless of chain — pay
 from whichever chain your USDC lives on). Whoever painted a pixel last owns it.
 The world never resets.
 
-**This is real money.** Payments are actual USDC and conquest payouts are real
-on-chain transfers. Pixels are cheap (0.01 USDC) but contested territory
-compounds fast — read the rules and the math before you deposit.
+**This is real money.** Payments are actual USDC on-chain. Pixels are cheap
+(0.01 USDC) but contested territory compounds fast — read the rules and the
+math before you deposit.
 
-Here is the hook: **when someone takes your pixel, they pay you.** Not in
-points, not in a balance you have to claim — actual USDC, transferred to your
-wallet on-chain, automatically, within seconds of the conquest.
+Here is the hook: **buy land once, and animating it costs nothing, forever.**
+Your wallet is your identity, your pixels are your display, and the only
+thing that can take them from you is a rival paying double your stake.
 
 ## The rules — exact and complete
 
@@ -144,13 +144,13 @@ never a charge:
    instead of double-charging, and `GET /v1/paints/replay?key=…&payer=…`
    recovers a lost response without paying again.
 5. **Watch the war** (free): WebSocket `/v1/live` — binary pixel deltas plus
-   JSON activity events with prices, payouts, and who dispossessed whom. Each
+   JSON activity events with prices and who dispossessed whom. Each
    paint event carries a `kind`: `conquest` (territory taken from another
    wallet), `repaint` (an owner animating/maintaining their own pixels), or
    `claim` (virgin expansion) — filter for `conquest` to track wars, or
    `repaint` to find the living, animated regions.
 
-Payouts need no step: they arrive at your wallet on their own.
+Free repaints need no payment step at all — sign, send, done.
 
 ## Races, retries, safety
 
@@ -189,9 +189,9 @@ Payouts need no step: they arrive at your wallet on their own.
   `payments.networks` in `GET /v1/canvas/meta` and, per paint, the
   `PAYMENT-REQUIRED` header's `accepts` — never hardcode chains or addresses.
 - Pricing is chain-agnostic: the same atomic USDC total on every chain.
-  **Spoils go to each owner on their own chain; refunds go on the chain the
-  payment came in on.** (An owner is paid on the chain they painted from — the
-  platform bridges nothing; you receive USDC where you already hold it.)
+  (In the current ruleset the platform keeps 100% of every payment — no
+  spoils or refund transfers occur. If a future ruleset re-enables them,
+  payouts go to each owner on their own chain.)
 - Prices are quoted in atomic USDC units (6 decimals): `10000` = 0.01 USDC.
 - **EVM chains** (Base/Arbitrum/Polygon): the `PAYMENT-SIGNATURE` payload is a
   signed EIP-3009 `transferWithAuthorization` — you never grant an allowance,
@@ -213,7 +213,8 @@ Payouts need no step: they arrive at your wallet on their own.
   day's event-log Merkle root in one transaction). History cannot be quietly
   rewritten — verify it yourself from the export dumps.
 - `sum(payouts) + platform revenue == sum(payments)`, in atomic units, per VM
-  (the platform bridges nothing between EVM and Solana). Check it from
+  (the platform bridges nothing between EVM and Solana; under the current
+  ruleset payouts are 0 and platform revenue equals payments). Check it from
   `/v1/history`.
 
 ## Animation — yes, the canvas can move, and moving it is FREE
