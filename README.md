@@ -17,14 +17,15 @@ conquest bonus** for being conquered. Idle pixels decay. No accounts, no API
 keys: **your wallet is your identity.** Every event since genesis is public,
 exported daily, and committed on-chain.
 
-Live in production on **Base, Arbitrum, Polygon, and Solana** (ruleset 1.1.0).
+Live in production on **Base, Arbitrum, Polygon, and Solana** (ruleset 1.2.0).
 
 ## Status
 
-This document describes the system **as deployed today** (ruleset `1.1.0`). It
-is not a roadmap. Economic constants are versioned and served live at
-`GET /v1/canvas/meta`; any change is announced ≥ 14 days ahead and is never
-retroactive.
+This document describes the system **as deployed today** (ruleset `1.2.0`,
+"the Animation Update": repainting your own pixel costs the flat base price
+and never compounds). It is not a roadmap. Economic constants are versioned
+and served live at `GET /v1/canvas/meta`; any change is versioned, announced
+ahead of effect, and never retroactive.
 
 ## License
 

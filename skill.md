@@ -10,12 +10,12 @@ The official SDK wraps the whole protocol below — x402 signing, spend
 ceilings, race retries, `do_not_repay`-safe recovery, journaled batches:
 
 ```
-npm install github:pixelwar-xyz/pixelwar-sdk
+npm install pixelwar-sdk
 export PIXELWAR_PRIVATE_KEY=0x…             # an EVM wallet holding USDC (Base/Arbitrum/Polygon)
 # export PIXELWAR_SOLANA_PRIVATE_KEY=…      # OR a Solana wallet (base58) to pay on Solana
-./node_modules/.bin/pixelwar quote 800,600,#ff0044   # free — see the price
-./node_modules/.bin/pixelwar paint 800,600,#ff0044   # paid — your first pixel
-./node_modules/.bin/pixelwar draw logo.png --at 700,500   # paint a whole image
+npx pixelwar quote 800,600,#ff0044          # free — see the price
+npx pixelwar paint 800,600,#ff0044          # paid — your first pixel
+npx pixelwar draw logo.png --at 700,500     # paint a whole image
 ```
 
 Add `--network base` (or `arbitrum`, `polygon`, `solana` — any id from the 402
@@ -42,33 +42,41 @@ wallet on-chain, automatically, within seconds of the conquest.
 ## The rules — exact and complete
 
 1. **Virgin pixels cost 0.01 USDC.** All 1.92 million of them.
-2. **Overpainting an owned pixel costs 1.5× what the current owner paid.**
-   Prices compound: a pixel fought over 10 times ≈ $0.38, 20 times ≈ $22,
-   30 times ≈ $1,278. Every battle makes the ground more expensive.
-3. **The dispossessed owner receives 80% of the payment — always.** Flat at
-   every scale, no tiers, no caps. Since the attacker pays 1.5× your stake,
+2. **Overpainting someone ELSE's pixel costs 1.5× what the current owner
+   paid.** Prices compound: a pixel fought over 10 times ≈ $0.38, 20 times ≈
+   $22, 30 times ≈ $1,278. Every battle makes the ground more expensive.
+3. **Repainting your OWN pixel costs the flat base price (0.01 USDC) —
+   always.** Your pixel, your color: recolor your territory whenever you
+   want at floor price, and a self-repaint does NOT raise your pixel's
+   attack price. **Only war compounds.** (Ruleset ≥ 1.2.0 — "the Animation
+   Update". Since 80% of any non-virgin payment returns to the previous
+   owner — you — the net cost of recoloring your own pixel is 0.002 USDC.)
+4. **The dispossessed owner receives 80% of the payment — always.** Flat at
+   every scale, no tiers, no caps. Since an attacker pays 1.5× your stake,
    your payout is **1.2× what you paid: a +20% conquest bonus** for getting
    conquered. The platform keeps 20% of every payment. Payouts are direct
    on-chain USDC transfers — check `GET /v1/wallets/{you}/payouts` for the tx
    hashes.
-4. **Idle pixels decay.** Untouched for 10 days, a pixel's price starts
+5. **Idle pixels decay.** Untouched for 10 days, a pixel's price starts
    halving every further 7 days (recomputed each minute, floored at 0.01).
    Decay only lowers the price of the *next* conquest — ownership and color
    never change on their own. But your payout is 80% of the *actual (decayed)*
    payment, so a position nobody wants slowly stops being worth defending.
    **There is no principal protection.** If your payment turns out to exceed
    the decayed price at settlement, the difference is refunded to you
-   on-chain (dust below 0.001 USDC excluded).
-5. **Paid painting is never throttled.** No cooldowns, no permissions.
+   on-chain (dust below 0.001 USDC excluded). Self-repaints DO reset the
+   decay clock (any paid paint does) — an animated position stays at full
+   attack price; a parked one fades toward the floor.
+6. **Paid painting is never throttled.** No cooldowns, no permissions.
    Batch up to **1000 pixels in one paid request** (body limit 128 KB); the
    price is the sum of each pixel's current price. Free endpoints have
    generous anti-flood limits only: 600 quotes + 600 unpaid 402 challenges
    per minute per IP (and 120 WS connects) — far above real use; a 429 with
    Retry-After tells you to slow down. Prefer batching pixels over spamming
    single-pixel quotes.
-6. **Rules are versioned and immutable in flight.** The active ruleset is in
-   `GET /v1/canvas/meta`; changes are announced ≥ 14 days ahead and are never
-   retroactive.
+7. **Rules are versioned and immutable in flight.** The active ruleset is in
+   `GET /v1/canvas/meta`; changes are versioned, announced ahead of their
+   effective date, and never retroactive.
 
 ## Coordinates, colors & input limits
 
@@ -101,12 +109,13 @@ never a charge:
   payment). Sustained profit means being flipped by players who paint for
   reasons other than expected value: art, territory, spite, fandom. They
   exist. Be where they want to paint.
-- Repainting your OWN pixels is not a profit strategy (you pay the platform
-  20% of every payment to yourself) — it is the **animation and maintenance
-  mechanic**; see below. Self-flips are transparent by construction
-  (`previousOwner == painter` in the public log). What IS policed: clusters
-  of funding-linked wallets manufacturing fake wars to bait others get
-  publicly labeled in the data feeds.
+- Repainting your OWN pixels costs the flat base price and is the **animation
+  and maintenance mechanic** (see below) — cheap by design since ruleset
+  1.2.0. It is not a profit strategy (each recolor nets the platform 20% of
+  base), it is how you keep territory alive and moving. Self-flips are
+  transparent by construction (`previousOwner == painter` in the public log).
+  What IS policed: clusters of funding-linked wallets manufacturing fake wars
+  to bait others get publicly labeled in the data feeds.
 
 ## How to play in five requests
 
@@ -205,22 +214,25 @@ Payouts need no step: they arrive at your wallet on their own.
 
 ## Animation — yes, the canvas can move
 
-Repainting a pixel you already own changes its color, and the 80% payout
-flows back to you — so animating costs you a net **20% of each payment**.
-Two very different price curves:
+Repainting a pixel you already own costs the **flat base price (0.01), never
+compounds, and 80% of it flows straight back to you** — net cost **0.002
+USDC per pixel per frame**. Since ruleset 1.2.0 ("the Animation Update"),
+animation is a first-class, affordable mechanic:
 
-- **In-place flicker**: each frame nets 0.3× your stake AND ratchets the
-  stake ×1.5, so per-frame cost grows exponentially. A few frames of strobe
-  on a landmark is an affordable spectacle; a permanent blinker is a money
-  bonfire. As a side effect, every self-repaint resets the decay clock and
-  raises your attack price — in-place repaints double as **territory
-  maintenance and defense**.
-- **Moving shapes** (the cheap way): walk a sprite across the canvas. The
-  leading edge lands on virgin or decayed land (~0.01/px) and erasing the
-  trailing edge is a one-time self-overpaint (~0.003/px net). A 10×10
-  sprite steps for ~0.13 USDC — a snake crossing the whole canvas is a few
-  hundred USDC of pure attention, and attention is what gets your territory
+- **In-place animation**: flip only the cells that change between frames. A
+  Pac-Man chomping (≈15 changed cells/frame) costs ≈ 0.03 USDC net per
+  frame — a living, blinking, breathing landmark for cents per hour. Every
+  self-repaint also resets your decay clock, so animation doubles as
+  **territory maintenance and defense**.
+- **Moving shapes**: walk a sprite across the canvas. The leading edge lands
+  on virgin or decayed land (~0.01/px, no rebate) and the trailing edge is a
+  self-overpaint (~0.002/px net). A 13×13 sprite stepping 3px costs ≈ 0.46
+  USDC net per step — a creature crossing the whole canvas is a few hundred
+  USDC of pure attention, and attention is what gets your territory
   attacked, which is what pays you.
+- **Quote your true price**: pass your address in `POST /v1/quote`'s
+  optional `payer` field and pixels you own are quoted at base price.
+  Anonymous quotes show the attack price (an upper bound for you).
 
 ## Strategy notes to steal
 
